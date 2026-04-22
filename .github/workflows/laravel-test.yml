@@ -16,7 +16,7 @@ on:
         type: string
         default: "20"
     secrets:
-      TELEGRAM_REPORTER_TOKEN:
+      TELEGRAM_NOTIFIER_TOKEN:
         required: false
       TELEGRAM_CHANNEL_ID:
         required: false
@@ -77,7 +77,7 @@ jobs:
         if: success()
         uses: monjizeen-dev/shared-ci/actions/telegram-notify@main
         with:
-          bot-token: ${{ secrets.TELEGRAM_REPORTER_TOKEN }}
+          bot-token: ${{ secrets.TELEGRAM_NOTIFIER_TOKEN }}
           channel-id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           status: success
           title: "Tests Passed"
@@ -86,7 +86,7 @@ jobs:
         if: failure()
         uses: monjizeen-dev/shared-ci/actions/telegram-notify@main
         with:
-          bot-token: ${{ secrets.TELEGRAM_REPORTER_TOKEN }}
+          bot-token: ${{ secrets.TELEGRAM_NOTIFIER_TOKEN }}
           channel-id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           status: failure
           title: "Tests Failed"
