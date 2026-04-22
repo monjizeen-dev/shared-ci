@@ -28,7 +28,7 @@ jobs:
         run: flutter test
 
       - name: Notify Telegram - Passed
-        if: success() && secrets.TELEGRAM_BOT_TOKEN != ''
+        if: success()
         uses: monjizeen-dev/shared-ci/actions/telegram-notify@main
         with:
           bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -37,7 +37,7 @@ jobs:
           title: "Tests Passed"
 
       - name: Notify Telegram - Failed
-        if: failure() && secrets.TELEGRAM_BOT_TOKEN != ''
+        if: failure()
         uses: monjizeen-dev/shared-ci/actions/telegram-notify@main
         with:
           bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
