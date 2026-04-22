@@ -1,0 +1,31 @@
+name: Setup Laravel
+description: Install PHP, Composer dependencies, and prepare test environment
+
+inputs:
+  php-version:
+    description: PHP version to install
+    default: "8.4"
+  php-extensions:
+    description: Comma-separated PHP extensions
+    default: sqlite3, pdo_sqlite, mbstring, xml, curl
+
+runs:
+  using: composite
+  steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        extensions: ${{ inputs.php-extensions }}
+        coverage: none
+
+    - name: Install PHP dependencies
+      run: composer install --no-interaction --prefer-dist
+      shell: bash
+
+    - name: Prepare environment
+      run: |
+        cp .env.example .env
+        php artisan key:generate
+        touch database/database.sqlite
+      shell: bash

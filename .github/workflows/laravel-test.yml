@@ -1,0 +1,92 @@
+name: Laravel Test
+
+on:
+  workflow_call:
+    inputs:
+      php-version:
+        description: PHP version
+        type: string
+        default: "8.4"
+      node-required:
+        description: Whether to install Node.js and build frontend
+        type: boolean
+        default: false
+      node-version:
+        description: Node.js version (if node-required is true)
+        type: string
+        default: "20"
+    secrets:
+      TELEGRAM_BOT_TOKEN:
+        required: false
+      TELEGRAM_CHANNEL_ID:
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Laravel
+        uses: monjizeen-dev/.github/actions/setup-laravel@main
+        with:
+          php-version: ${{ inputs.php-version }}
+
+      - name: Setup Node
+        if: ${{ inputs.node-required }}
+        uses: actions/setup-node@v4.4.0
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - name: Install Node dependencies
+        if: ${{ inputs.node-required }}
+        run: npm ci
+
+      - name: Build frontend
+        if: ${{ inputs.node-required }}
+        run: npm run build
+
+      - name: Pint (style check)
+        run: ./vendor/bin/pint --test
+
+      - name: PHPStan (static analysis)
+        if: hashFiles('phpstan.neon', 'phpstan.neon.dist') != ''
+        run: ./vendor/bin/phpstan analyse --no-progress --memory-limit=2G
+        continue-on-error: true
+
+      - name: ESLint (frontend)
+        if: ${{ inputs.node-required && hashFiles('.eslintrc*', 'eslint.config*') != '' }}
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Run migrations
+        run: php artisan migrate --force
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+
+      - name: Run tests
+        run: php artisan test
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+
+      - name: Notify Telegram - Passed
+        if: success() && secrets.TELEGRAM_BOT_TOKEN != ''
+        uses: monjizeen-dev/.github/actions/telegram-notify@main
+        with:
+          bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          channel-id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          status: success
+          title: "Tests Passed"
+
+      - name: Notify Telegram - Failed
+        if: failure() && secrets.TELEGRAM_BOT_TOKEN != ''
+        uses: monjizeen-dev/.github/actions/telegram-notify@main
+        with:
+          bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          channel-id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          status: failure
+          title: "Tests Failed"

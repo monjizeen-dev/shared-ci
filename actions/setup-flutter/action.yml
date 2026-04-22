@@ -1,0 +1,20 @@
+name: Setup Flutter
+description: Install Flutter SDK and project dependencies
+
+inputs:
+  flutter-channel:
+    description: Flutter release channel
+    default: stable
+
+runs:
+  using: composite
+  steps:
+    - name: Install Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: ${{ inputs.flutter-channel }}
+        cache: true
+
+    - name: Install dependencies
+      run: flutter pub get
+      shell: bash

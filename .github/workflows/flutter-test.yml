@@ -1,0 +1,46 @@
+name: Flutter Test
+
+on:
+  workflow_call:
+    secrets:
+      TELEGRAM_BOT_TOKEN:
+        required: false
+      TELEGRAM_CHANNEL_ID:
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Flutter
+        uses: monjizeen-dev/.github/actions/setup-flutter@main
+
+      - name: Check formatting
+        run: dart format --set-exit-if-changed .
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Notify Telegram - Passed
+        if: success() && secrets.TELEGRAM_BOT_TOKEN != ''
+        uses: monjizeen-dev/.github/actions/telegram-notify@main
+        with:
+          bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          channel-id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          status: success
+          title: "Tests Passed"
+
+      - name: Notify Telegram - Failed
+        if: failure() && secrets.TELEGRAM_BOT_TOKEN != ''
+        uses: monjizeen-dev/.github/actions/telegram-notify@main
+        with:
+          bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          channel-id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          status: failure
+          title: "Tests Failed"
