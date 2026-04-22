@@ -22,7 +22,7 @@ actions/
 ```yaml
 jobs:
   test:
-    uses: monjizeen-dev/.github/.github/workflows/flutter-test.yml@main
+    uses: monjizeen-dev/shared-ci/.github/workflows/flutter-test.yml@main
     secrets: inherit
 
   deploy:
@@ -35,7 +35,7 @@ jobs:
 ```yaml
 jobs:
   test:
-    uses: monjizeen-dev/.github/.github/workflows/laravel-test.yml@main
+    uses: monjizeen-dev/shared-ci/.github/workflows/laravel-test.yml@main
     with:
       node-required: true  # if project has frontend assets
     secrets: inherit
@@ -43,7 +43,7 @@ jobs:
   deploy-staging:
     needs: test
     steps:
-      - uses: monjizeen-dev/.github/actions/deploy-laravel@main
+      - uses: monjizeen-dev/shared-ci/actions/deploy-laravel@main
         with:
           host: 187.77.109.160
           username: www-data
