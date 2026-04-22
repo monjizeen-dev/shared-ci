@@ -3,7 +3,7 @@ name: Flutter Test
 on:
   workflow_call:
     secrets:
-      TELEGRAM_BOT_TOKEN:
+      TELEGRAM_REPORTER_TOKEN:
         required: false
       TELEGRAM_CHANNEL_ID:
         required: false
@@ -31,7 +31,7 @@ jobs:
         if: success()
         uses: monjizeen-dev/shared-ci/actions/telegram-notify@main
         with:
-          bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          bot-token: ${{ secrets.TELEGRAM_REPORTER_TOKEN }}
           channel-id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           status: success
           title: "Tests Passed"
@@ -40,7 +40,7 @@ jobs:
         if: failure()
         uses: monjizeen-dev/shared-ci/actions/telegram-notify@main
         with:
-          bot-token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          bot-token: ${{ secrets.TELEGRAM_REPORTER_TOKEN }}
           channel-id: ${{ secrets.TELEGRAM_CHANNEL_ID }}
           status: failure
           title: "Tests Failed"
