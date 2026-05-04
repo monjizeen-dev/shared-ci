@@ -2,6 +2,15 @@ name: Flutter Test
 
 on:
   workflow_call:
+    inputs:
+      format-paths:
+        description: Paths to check formatting (space-separated)
+        type: string
+        default: "."
+      test-paths:
+        description: Paths to run tests on (space-separated)
+        type: string
+        default: ""
     secrets:
       TELEGRAM_NOTIFIER_TOKEN:
         required: false
@@ -19,7 +28,7 @@ jobs:
         uses: monjizeen-dev/shared-assets/actions/setup-flutter@main
 
       - name: Check formatting
-        run: dart format --set-exit-if-changed .
+        run: dart format --set-exit-if-changed ${{ inputs.format-paths }}
 
       - name: Analyze
         run: flutter analyze

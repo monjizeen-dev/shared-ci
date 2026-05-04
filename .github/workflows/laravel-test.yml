@@ -15,6 +15,10 @@ on:
         description: Node.js version (if node-required is true)
         type: string
         default: "20"
+      db-connection:
+        description: Database connection (sqlite or mysql)
+        type: string
+        default: "sqlite"
     secrets:
       TELEGRAM_NOTIFIER_TOKEN:
         required: false
@@ -24,6 +28,19 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
@@ -64,14 +81,22 @@ jobs:
       - name: Run migrations
         run: php artisan migrate --force
         env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: database/database.sqlite
+          DB_CONNECTION: ${{ inputs.db-connection }}
+          DB_DATABASE: ${{ inputs.db-connection == 'sqlite' && 'database/database.sqlite' || 'testing' }}
+          DB_HOST: ${{ inputs.db-connection == 'mysql' && '127.0.0.1' || '' }}
+          DB_PORT: ${{ inputs.db-connection == 'mysql' && '3306' || '' }}
+          DB_USERNAME: ${{ inputs.db-connection == 'mysql' && 'root' || '' }}
+          DB_PASSWORD: ${{ inputs.db-connection == 'mysql' && 'password' || '' }}
 
       - name: Run tests
         run: php artisan test
         env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: database/database.sqlite
+          DB_CONNECTION: ${{ inputs.db-connection }}
+          DB_DATABASE: ${{ inputs.db-connection == 'sqlite' && 'database/database.sqlite' || 'testing' }}
+          DB_HOST: ${{ inputs.db-connection == 'mysql' && '127.0.0.1' || '' }}
+          DB_PORT: ${{ inputs.db-connection == 'mysql' && '3306' || '' }}
+          DB_USERNAME: ${{ inputs.db-connection == 'mysql' && 'root' || '' }}
+          DB_PASSWORD: ${{ inputs.db-connection == 'mysql' && 'password' || '' }}
 
       - name: Notify Telegram - Passed
         if: success()
