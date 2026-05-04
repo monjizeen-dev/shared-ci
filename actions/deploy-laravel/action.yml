@@ -30,7 +30,6 @@ runs:
         host: ${{ inputs.host }}
         username: ${{ inputs.username }}
         key: ${{ inputs.ssh-key }}
-        script_stop: true
         script: |
           set -e
           cd ${{ inputs.deploy-path }}
