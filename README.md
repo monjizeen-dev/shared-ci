@@ -1,6 +1,6 @@
-# monjizeen-dev Shared CI/CD
+# monjizeen-dev Shared Assets
 
-Shared GitHub Actions workflows and composite actions for all monjizeen-dev projects.
+Shared GitHub Actions workflows, composite actions, and Claude Code skills for all monjizeen-dev projects.
 
 ## Structure
 
@@ -13,6 +13,8 @@ actions/
 .github/workflows/
   flutter-test.yml   # Reusable: format + analyze + test
   laravel-test.yml   # Reusable: pint + phpstan + migrate + test
+skills/
+  (Claude Code skills)
 ```
 
 ## Usage
@@ -22,7 +24,7 @@ actions/
 ```yaml
 jobs:
   test:
-    uses: monjizeen-dev/shared-ci/.github/workflows/flutter-test.yml@main
+    uses: monjizeen-dev/shared-assets/.github/workflows/flutter-test.yml@main
     secrets: inherit
 
   deploy:
@@ -35,7 +37,7 @@ jobs:
 ```yaml
 jobs:
   test:
-    uses: monjizeen-dev/shared-ci/.github/workflows/laravel-test.yml@main
+    uses: monjizeen-dev/shared-assets/.github/workflows/laravel-test.yml@main
     with:
       node-required: true  # if project has frontend assets
     secrets: inherit
@@ -43,7 +45,7 @@ jobs:
   deploy-staging:
     needs: test
     steps:
-      - uses: monjizeen-dev/shared-ci/actions/deploy-laravel@main
+      - uses: monjizeen-dev/shared-assets/actions/deploy-laravel@main
         with:
           host: 187.77.109.160
           username: www-data
