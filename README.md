@@ -11,8 +11,9 @@ actions/
   deploy-laravel/    # SSH deploy with artisan cache/migrate
   telegram-notify/   # Send Telegram status notification
 .github/workflows/
-  flutter-test.yml   # Reusable: format + analyze + test
-  laravel-test.yml   # Reusable: pint + phpstan + migrate + test
+  flutter-test.yml        # Reusable: format + analyze + test
+  laravel-test.yml        # Reusable: pint + phpstan + migrate + test (SQLite)
+  laravel-test-mysql.yml  # Reusable: same as above but with MySQL service
 skills/
   (Claude Code skills)
 ```
@@ -32,7 +33,7 @@ jobs:
     # your project-specific deploy steps
 ```
 
-### Laravel project
+### Laravel project (SQLite)
 
 ```yaml
 jobs:
@@ -40,6 +41,17 @@ jobs:
     uses: monjizeen-dev/shared-assets/.github/workflows/laravel-test.yml@main
     with:
       node-required: true  # if project has frontend assets
+    secrets: inherit
+```
+
+### Laravel project (MySQL)
+
+Use this when migrations have MySQL-specific syntax (raw SQL, composite keys, etc.)
+
+```yaml
+jobs:
+  test:
+    uses: monjizeen-dev/shared-assets/.github/workflows/laravel-test-mysql.yml@main
     secrets: inherit
 
   deploy-staging:
