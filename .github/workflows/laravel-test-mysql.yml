@@ -40,6 +40,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 2
+
+      - name: Clear Composer Cache (if lock changed)
+        run: |
+          if git diff HEAD~1 composer.lock > /dev/null 2>&1; then
+            rm -rf ~/.composer/cache/*
+            echo "✓ Cleared composer cache (composer.lock changed)"
+          else
+            echo "✓ Using cached composer dependencies"
+          fi
 
       - name: Setup Laravel
         uses: monjizeen-dev/shared-assets/actions/setup-laravel@main
